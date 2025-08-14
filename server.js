@@ -4,8 +4,7 @@ import cors from 'cors'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
-const express = require('express');
-const cors = require('cors');
+
 
 const app = express()
 app.use(express.json())
@@ -22,17 +21,21 @@ app.get('/usuarios', async (req, res) => {
 })
 
 app.post('/usuarios', async (req, res) => {
+     try {
     const user = await prisma.user.create({
         data: {
             email: req.body.email,
-            age: req.body.age,
+            age: Number(req.body.age),
             name: req.body.name
         }
     })
   
     res.status(201).json({ message: "usuario cadastrado com sucesso", user })
+       } catch (error) {
+        console.error("Erro ao criar usuário:", error); 
+        res.status(500).json({ error: "Erro interno no servidor" });
+    }
 })  
-
 
     app.put('/usuarios/:id', async (req, res) => {
 
@@ -54,7 +57,7 @@ app.post('/usuarios', async (req, res) => {
     app.delete('/usuarios/:id', async (req,rest) =>{
         await prisma.user.delete ({
             where: {
-                id:Number (req.params.id)
+                id:  (req.params.id)
             }
 
         })
